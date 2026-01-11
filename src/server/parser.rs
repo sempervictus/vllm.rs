@@ -306,9 +306,10 @@ impl StreamToolParser {
             ParserState::Normal => {
                 // Check for start trigger - which should be the only token on the line
                 if self.is_start_token(token_id, token_text)
-                    && token_text
-                        .lines()
-                        .any(|l| l.trim() == self.config.start_token_str.trim())
+                    && (self.config.start_token_str.trim() != "<tool_call>" // ignore line check for other formats
+                        || token_text
+                            .lines()
+                            .any(|l| l.trim() == self.config.start_token_str.trim()))
                 {
                     let pos = token_text.find(&self.config.start_token_str).unwrap(); // infallible due to check above
                     self.state = ParserState::Buffering;
